@@ -21,9 +21,12 @@ if notebook.__version__[0] < '4':
     print("notebook version 4.x is required")
 
 for p in psutil.process_iter():
-    if "jupyter-notebook" in p.name():
-        print("Cannot install while the Jupyter notebook server is running")
-        exit()
+    try:
+        if "jupyter-notebook" in p.name():
+            print("Cannot install while the Jupyter notebook server is running")
+            exit()
+    except psutil.NoSuchProcess:
+        continue
 
 if len(sys.argv) == 2 and sys.argv[1] == "install":
     print("Installing Jupyter notebook extensions")
@@ -44,16 +47,16 @@ def recursive_overwrite(src, dest, ignore=None):
             ignored = set()
         for f in files:
             if f not in ignored:
-                recursive_overwrite(os.path.join(src, f), 
-                                    os.path.join(dest, f), 
+                recursive_overwrite(os.path.join(src, f),
+                                    os.path.join(dest, f),
                                     ignore)
     else:
         shutil.copyfile(src, dest)
 
 
 def remove_old_config(config):
-    """ Remove old configuration entries 
-    
+    """ Remove old configuration entries
+
     :param config: python configuration data
     """
     marker_found = []
@@ -67,8 +70,8 @@ def remove_old_config(config):
 
 
 def update_config(config_file, newconfig_file):
-    """ Update .py configuration file with new path to extensions 
-    
+    """ Update .py configuration file with new path to extensions
+
     :param config_file: name of the existing python config file
     :param newconfig_file: name of the config file to be written into the existing python config file
     """
@@ -78,21 +81,21 @@ def update_config(config_file, newconfig_file):
         f.close()
     else:
         config = ''
-    
+
     # add config
     f = open(newconfig_file, 'r')
     new_config = f.read()
     f.close()
-    
+
     if config.find(marker) >= 0:
         config = remove_old_config(config)
 
-    config = marker + '\n' + new_config + '\n' + marker + '\n' + config    
-    
+    config = marker + '\n' + new_config + '\n' + marker + '\n' + config
+
     # write config file
     f = open(config_file, 'w')
     f.write(config)
-    f.close()        
+    f.close()
 
 
 #
@@ -115,7 +118,7 @@ if os.path.exists(data_dir) is False:
 #   Indiscriminately copy all files from the nbextensions, extensions and template directories
 #   Currently there is no other way, because there is no definition of a notebook extension package
 #
-        
+
 # copy extensions to IPython extensions directory
 src = 'extensions'
 destination = os.path.join(data_dir, 'extensions')
