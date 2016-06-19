@@ -1,20 +1,16 @@
 # Install notebook extensions
 
+from __future__ import print_function
 from jupyter_core.paths import jupyter_config_dir, jupyter_data_dir
 from traitlets.config.loader import Config, JSONFileConfigLoader
 import os
 import sys
 import json
 import shutil
-import IPython
 import notebook
 
 marker = '#--- nbextensions configuration ---'
 
-
-if IPython.__version__[0] < '4':
-    print("IPython version 4.x is required")
-    exit()
 
 if notebook.__version__[0] < '4':
     print("notebook version 4.x is required")
